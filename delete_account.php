@@ -80,47 +80,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-3xl bg-[#cb4335] bg-opacity-70 border-2 border-white rounded-lg shadow-lg p-8">
-        <h2 class="text-3xl font-bold text-center text-white mb-6">Delete Your SkillPro Account</h2>
-        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="space-y-6">
-            <div>
-                <label for="email" class="block text-white font-medium">Email</label>
-                <input type="email" name="email" id="email" 
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="currentPassword" class="block text-white font-medium">Current Password</label>
-                <input type="password" name="currentPassword" id="currentPassword" 
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="confirmPassword" class="block text-white font-medium">Confirm Password</label>
-                <input type="password" name="confirmPassword" id="confirmPassword" 
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <button type="submit" 
-                    name="submit" class="w-full px-6 py-3 text-lg font-medium text-[white] bg-[#ff3701] rounded-md hover:bg-[black] hover:text-[red] focus:outline-none focus:ring focus:ring-blue-300 mt-2">
-                    Permanently Delete Your SkillPro Account
-                </button>
-            </div>
-
-            <!-- Success and Error Messages -->
-            <?php if (!empty($successMessage)): ?>
-                <div class="mt-4 text-green-500">
-                    <p><?= $successMessage ?></p>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($errors)): ?>
-                <div class="mt-4 text-red-500">
-                    <?php foreach ($errors as $error): ?>
-                        <p><?= $error ?></p>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </form>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1a0000] via-[#660000] to-[#300000] p-6 font-sans">
+  <div class="w-full max-w-3xl bg-[#1a0000]/90 backdrop-blur-md border border-red-500/40 rounded-2xl shadow-2xl p-10 text-center">
+    
+    <!-- Header -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-16 h-16 flex items-center justify-center rounded-full bg-red-600/20 border border-red-500/50 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856C19.403 19 20 18.403 20 17.694V6.306C20 5.597 19.403 5 18.694 5H5.306C4.597 5 4 5.597 4 6.306v11.388C4 18.403 4.597 19 5.306 19z" />
+        </svg>
+      </div>
+      <h2 class="text-4xl font-semibold text-red-400 mb-2">Delete Your SkillPro Account</h2>
+      <p class="text-gray-300 text-sm max-w-lg">
+        This action <span class="text-red-400 font-semibold">cannot be undone</span>. All your data, courses, and records will be permanently removed.
+      </p>
     </div>
+
+    <!-- Form -->
+    <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="space-y-6 text-left">
+      <div>
+        <label for="email" class="block text-gray-300 mb-2 font-semibold">Email</label>
+        <input type="email" name="email" id="email"
+          class="w-full px-4 py-3 rounded-md bg-white text-gray-900 focus:ring-4 focus:ring-red-400 outline-none transition"
+          placeholder="Enter your email">
+      </div>
+
+      <div>
+        <label for="currentPassword" class="block text-gray-300 mb-2 font-semibold">Current Password</label>
+        <input type="password" name="currentPassword" id="currentPassword"
+          class="w-full px-4 py-3 rounded-md bg-white text-gray-900 focus:ring-4 focus:ring-red-400 outline-none transition"
+          placeholder="Enter your current password">
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-gray-300 mb-2 font-semibold">Confirm Password</label>
+        <input type="password" name="confirmPassword" id="confirmPassword"
+          class="w-full px-4 py-3 rounded-md bg-white text-gray-900 focus:ring-4 focus:ring-red-400 outline-none transition"
+          placeholder="Confirm your password">
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-4">
+        <button type="submit" name="submit"
+          class="w-full py-3 bg-gradient-to-r from-red-600 to-red-500 text-white text-lg font-semibold rounded-md shadow-md hover:from-red-700 hover:to-red-600 transition-all duration-300 focus:ring-4 focus:ring-red-400">
+          Permanently Delete My Account
+        </button>
+      </div>
+
+      <!-- Messages -->
+      <?php if (!empty($successMessage)): ?>
+        <div class="mt-4 text-green-400 text-center">
+          <p><?= $successMessage ?></p>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!empty($errors)): ?>
+        <div class="mt-4 text-red-400 text-center">
+          <?php foreach ($errors as $error): ?>
+            <p><?= $error ?></p>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+    </form>
+  </div>
 </body>
+
 </html>

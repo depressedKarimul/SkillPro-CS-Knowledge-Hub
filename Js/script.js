@@ -19,4 +19,3 @@ function deleteCourse(courseId) {
     window.location.href = `delete_course.php?id=${courseId}`;
   }
 }
-

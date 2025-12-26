@@ -1,0 +1,157 @@
+{
+  "name": "SkillPro",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "id": "70ebaefb-9099-494f-9afb-2eaba05e7746",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        448,
+        208
+      ],
+      "webhookId": "78bfa981-9eca-4b90-8b18-2efc7be7b0fe"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are SkillPro, a helpful and knowledgeable AI assistant.\n\nYour capabilities:\n- Answer ANY question users ask - general knowledge, technology, science, business, arts, daily life, or any other topic\n- Search and retrieve course information from the Google Sheet when users ask about courses\n- Provide detailed explanations, recommendations, and guidance on any subject\n- Help with problem-solving, learning, and decision-making\n\nHow to handle questions:\n\n1. For course-related questions:\n   - Use the Google Sheets Tool to search for relevant course information\n   - Present course details clearly with schedules, instructors, and requirements\n   - Help compare courses and provide recommendations based on the data\n\n2. For ALL other questions (general knowledge, explanations, advice, etc.):\n   - Provide accurate, helpful, and comprehensive answers using your knowledge\n   - Explain concepts clearly and thoroughly\n   - Ask clarifying questions if needed\n   - Be conversational and supportive\n\nYou can discuss any topic - technology, AI concepts, science, mathematics, business, career advice, arts, culture, daily life questions, problem-solving, and learning strategies.\n\nAlways be helpful, informative, and friendly!"
+        }
+      },
+      "id": "673cd04f-d303-4700-a41f-07ae36190f97",
+      "name": "Course Assistant Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        736,
+        208
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "89cad250-d735-4660-b016-e6286447f429",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14ilcWGAKZUb9R6wg60bUBNxiGJb3Gy_v0gklBhmDb8w",
+          "mode": "list",
+          "cachedResultName": "SkillPro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14ilcWGAKZUb9R6wg60bUBNxiGJb3Gy_v0gklBhmDb8w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 7724746,
+          "mode": "list",
+          "cachedResultName": "Courses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14ilcWGAKZUb9R6wg60bUBNxiGJb3Gy_v0gklBhmDb8w/edit#gid=7724746"
+        },
+        "options": {}
+      },
+      "id": "552d43bf-dc57-432b-a445-e1f43361c8e4",
+      "name": "SkillPro",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        432
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iSZ8Uw82o0kt5ltO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        672,
+        432
+      ],
+      "id": "2d47274f-95dc-4309-b07a-f15d86798fb2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iTv99lHQc6EQ5np4",
+          "name": "Model"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Course Assistant Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Course Assistant Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SkillPro": {
+      "ai_tool": [
+        [
+          {
+            "node": "Course Assistant Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Course Assistant Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c300a953-ef78-4df6-97a9-e694dcc96f4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fd24df650613903c52215ae624e669792588e240d7704952c978433245c11e0"
+  },
+  "id": "FnTlzyYrcex1XF7M",
+  "tags": []
+}

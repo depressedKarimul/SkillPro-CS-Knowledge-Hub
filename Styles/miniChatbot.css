@@ -1,0 +1,48 @@
+.n8n-chat-launcher {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  }
+
+  /* Chat window */
+  .n8n-chat-container {
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 0 25px rgba(0,0,0,0.18);
+  }
+
+  /* Header */
+  .n8n-chat-header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    color: #fff !important;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px !important;
+  }
+
+  /* User message bubble */
+  .n8n-chat-message-user {
+    background: #4f46e5 !important;
+    color: white !important;
+    border-radius: 15px !important;
+  }
+
+  /* Bot message bubble */
+  .n8n-chat-message-bot {
+    background: #f3f4f6 !important;
+    color: #111 !important;
+    border-radius: 15px !important;
+  }
+
+  /* Input box */
+  .n8n-chat-input textarea {
+    border-radius: 12px !important;
+    border: 1px solid #ddd !important;
+  }
+
+  /* Send button */
+  .n8n-chat-input button {
+    background: #4f46e5 !important;
+    border-radius: 12px !important;
+    color: white !important;
+  }

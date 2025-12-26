@@ -13,18 +13,17 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
    <?php include('head_content.php'); ?>
 </head>
 <body>
 
 
-
 <header>
     <!-- Navigation -->
     <nav id="navigation">
-      <div class="navbar bg-black">
+      <div class="navbar">
         <div class="navbar-start">
           <!-- Dropdown menu -->
           <div class="dropdown hidden">
@@ -45,10 +44,9 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
             <ul
               tabindex="0"
               class="menu menu-sm dropdown-content bg-black rounded-box z-[1] mt-3 w-52 p-2 shadow left-0">
-              <li><a>All Students</a></li>
-              <li><a>All Instructors</a></li>
-              <li><a>All Courses</a></li>
-              <li><a>All Courses</a></li>
+              <li><a>Homepage</a></li>
+              <li><a>Portfolio</a></li>
+              <li><a>About</a></li>
             </ul>
           </div>
         </div>
@@ -136,7 +134,7 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
             <ul
               tabindex="0"
               class="menu menu-sm dropdown-content rounded-box z-[1] mt-3 w-52 p-2 shadow bg-black text-white">
-              <li><a>Home</a></li>
+              <li><a href="instructor.php">Home</a></li>
 
               <li>
                 <a>Development</a>
@@ -196,7 +194,7 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
 
         <div class="navbar-center hidden lg:flex">
           <ul class="menu menu-horizontal px-1">
-            <li class="mark"><a>Home</a></li>
+            <li class="mark"><a href="instructor.php">Home</a></li>
             <li>
               <a href="">Development</a>
             </li>
@@ -228,8 +226,11 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
             class="hidden absolute right-0 mt-2 w-40 bg-[#021e3b] rounded-md shadow-lg z-10">
             <ul class="py-2 text-sm text-gray-100 h-auto">
               <li>
-                <a href="instructor_profile_edit.php" class="block px-4 py-2 hover:bg-[#01797a]">Profile</a>
+                <a href="instructor_profile.php" class="block px-4 py-2 hover:bg-[#01797a]">Profile</a>
               </li>
+              <!-- <li>
+                <a href="instructor_profile.php" class="block px-4 py-2 hover:bg-[#01797a]">Profile</a>
+              </li> -->
               <li>
                 <a href="Upload_Course.php" class="block px-4 py-2 hover:bg-[#01797a]">Upload Course</a>
               </li>
@@ -266,109 +267,116 @@ $profilePic = isset($_SESSION['profile_pic']) ? $_SESSION['profile_pic'] : 'defa
 
 
 
+<main>
+  <!-- Manage Courses Section -->
+  <section class="mt-10  py-10 px-5 rounded-lg shadow-md">
+    <h2 class="text-center text-4xl  font-extrabold mb-10">
+      Manage Courses: Edit and Delete
+    </h2>
 
-  <main>
-    
- <!-- Manage Courses: Edit and Delete -->
- <section class="mt-10 ">
-  <h2 class="text-center text-4xl text-white bg-[#283747] p-5 font-extrabold">Manage Courses: Edit and Delete</h2>
-
-  <?php
-  // Ensure the user is logged in
-  if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-  }
-
-  // Fetch the logged-in user ID
-  $user_id = $_SESSION['user_id'];
-
-  // Database connection
-  include('database.php');
-
-  // Get the instructor ID of the logged-in user
-  $query_instructor = "SELECT instructor_id FROM Instructor WHERE user_id = ?";
-  $stmt_instructor = $conn->prepare($query_instructor);
-  $stmt_instructor->bind_param("i", $user_id);
-  $stmt_instructor->execute();
-  $result_instructor = $stmt_instructor->get_result();
-  $instructor = $result_instructor->fetch_assoc();
-
-  if (!$instructor) {
-    echo "No instructor profile found.";
-    exit();
-  }
-
-  $instructor_id = $instructor['instructor_id'];
-
-  // Query to fetch courses with their course_id and video content
-  $sql = "
-  SELECT 
-      Course.course_id,
-      Course.title AS course_title, 
-      Course.description, 
-      Course.category, 
-      Course.price, 
-      Course_Content.file_url 
-  FROM 
-      Course 
-  LEFT JOIN 
-      Course_Content ON Course.course_id = Course_Content.course_id 
-  WHERE 
-      Course_Content.type = 'video' 
-      AND Course.instructor_id = ?";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("i", $instructor_id);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  ?>
-
-  <div class="flex flex-wrap justify-center">
     <?php
-    if ($result && $result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $course_id = htmlspecialchars($row['course_id']);
+    // Ensure the user is logged in
+    if (!isset($_SESSION['user_id'])) {
+      header("Location: login.php");
+      exit();
+    }
+
+    // Fetch the logged-in user ID
+    $user_id = $_SESSION['user_id'];
+
+    // Database connection
+    include('database.php');
+
+    // Get the instructor ID of the logged-in user
+    $query_instructor = "SELECT instructor_id FROM Instructor WHERE user_id = ?";
+    $stmt_instructor = $conn->prepare($query_instructor);
+    $stmt_instructor->bind_param("i", $user_id);
+    $stmt_instructor->execute();
+    $result_instructor = $stmt_instructor->get_result();
+    $instructor = $result_instructor->fetch_assoc();
+
+    if (!$instructor) {
+      echo "<p class='text-center text-red-500'>No instructor profile found.</p>";
+      exit();
+    }
+
+    $instructor_id = $instructor['instructor_id'];
+
+    // Query to fetch courses with their course_id and video content
+    $sql = "
+    SELECT 
+        Course.course_id,
+        Course.title AS course_title, 
+        Course.description, 
+        Course.category, 
+        Course.price, 
+        Course_Content.file_url 
+    FROM 
+        Course 
+    LEFT JOIN 
+        Course_Content ON Course.course_id = Course_Content.course_id 
+    WHERE 
+        Course_Content.type = 'video' 
+        AND Course.instructor_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $instructor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
     ?>
-        <div class="card bg-base-100 w-96 shadow-xl m-4">
-          <video class="h-full w-full rounded-lg" controls>
-            <source src="<?php echo htmlspecialchars($row['file_url']); ?>" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          <div class="card-body">
-            <h2 class="card-title"><?php echo htmlspecialchars($row['course_title']); ?></h2>
-            <p><?php echo htmlspecialchars($row['description']); ?></p>
-            <p>Category: <?php echo htmlspecialchars($row['category']); ?></p>
-            <p>Price: $<?php echo htmlspecialchars($row['price']); ?></p>
-            <p><strong>Course ID:</strong> <?php echo $course_id; ?></p>
-            <div class="flex justify-between mt-4">
-              <!-- Edit Button -->
-<a href="course_content_edit.php?course_id=<?php echo $course_id; ?>" class="btn btn-primary w-32">Edit</a>
 
-              <!-- Delete Button -->
-              <form action="delete_course2.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
-    <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
-    <button type="submit" class="btn bg-[red] w-32">Delete</button>
-</form>
+    <div class="flex flex-wrap justify-center gap-8">
+      <?php
+      if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+          $course_id = htmlspecialchars($row['course_id']);
+      ?>
+          <div class="card  border border-gray-200 shadow-lg hover:shadow-xl transition-all w-96">
+            <video class="w-full rounded-t-lg" controls>
+              <source src="<?php echo htmlspecialchars($row['file_url']); ?>" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div class="card-body p-5">
+              <h2 class="card-title text-2xl font-bold ">
+                <?php echo htmlspecialchars($row['course_title']); ?>
+              </h2>
+              <p class= mt-2"><?php echo htmlspecialchars($row['description']); ?></p>
+              <p class=""><strong>Category:</strong> <?php echo htmlspecialchars($row['category']); ?></p>
+              <p class=""><strong>Price:</strong> $<?php echo htmlspecialchars($row['price']); ?></p>
+              <p class=""><strong>Course ID:</strong> <?php echo $course_id; ?></p>
 
+              <div class="flex justify-between mt-5">
+                <!-- Edit Button -->
+                <a href="course_content_edit.php?course_id=<?php echo $course_id; ?>" 
+                   class="btn bg-[#2874A6] hover:bg-[#1B4F72] text-white w-32 border-none">
+                  Edit
+                </a>
+
+                <!-- Delete Button -->
+                <form action="delete_course2.php" method="POST" 
+                      onsubmit="return confirm('Are you sure you want to delete this course?');">
+                  <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                  <button type="submit" 
+                          class="btn bg-[#C0392B] hover:bg-[#922B21] text-white w-32 border-none">
+                    Delete
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-    <?php
+      <?php
+        }
+      } else {
+        echo '<p class="text-center text-gray-600 text-lg">No courses available yet.</p>';
       }
-    } else {
-      echo '<p>No courses available.</p>';
-    }
-    ?>
-  </div>
-</section>
-
-    
-   </main>
+      ?>
+    </div>
+  </section>
+</main>
 
     
 
 
-   i<?php include('footer.php') ?>
+   
 
    <script src="js/script.js"></script>
 

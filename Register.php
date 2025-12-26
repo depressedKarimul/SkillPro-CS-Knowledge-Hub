@@ -1,3 +1,4 @@
+<!-- Register.php -->
 <?php
 include("database.php");
 $errors = [];
@@ -16,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle file upload
     $profilePic = "";
     if (isset($_FILES["profile_pic"]) && $_FILES["profile_pic"]["error"] == 0) {
-        $uploadDir = "C:/xampp/htdocs/cse311/images/"; // Ensure this folder exists
+        $uploadDir = "C:/xampp/htdocs/cse299/images/"; // Ensure this folder exists
         $fileName = basename($_FILES["profile_pic"]["name"]);
         $targetPath = $uploadDir . $fileName;
 
@@ -93,6 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -103,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-image: url('https://images.unsplash.com/photo-1689443111130-6e9c7dfd8f9e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-image: url('https://i.postimg.cc/Tw9nySpP/5578502.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -111,75 +113,110 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-3xl bg-blue-950 bg-opacity-70 border-2 border-white rounded-lg shadow-lg p-8">
-        <h2 class="text-3xl font-bold text-center text-white mb-6">User Registration</h2>
-        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" class="space-y-6">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 flex items-center justify-center">
 
-            <div>
-                <label for="firstName" class="block text-white font-medium">First Name</label>
-                <input type="text" name="firstName" id="firstName"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="lastName" class="block text-white font-medium">Last Name</label>
-                <input type="text" name="lastName" id="lastName"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="email" class="block text-white font-medium">Email</label>
-                <input type="email" name="email" id="email"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="password" class="block text-white font-medium">Password</label>
-                <input type="password" name="password" id="password"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="role" class="block text-white font-medium">Role</label>
-                <select name="role" id="role"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md focus:outline-none focus:ring focus:ring-white">
-                    <option value="" class="bg-gray-900">Select Role</option>
-                    <option value="student" class="bg-gray-900">Student</option>
-                    <option value="instructor" class="bg-gray-900">Instructor</option>
+  <div class="w-full max-w-6xl bg-white shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row">
 
-                </select>
-            </div>
-            <div>
-                <label for="profile_pic" class="block text-white font-medium">Profile Picture</label>
-                <input type="file" name="profile_pic" id="profile_pic"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md focus:outline-none focus:ring focus:ring-white">
-            </div>
-            <div>
-                <label for="bio" class="block text-white font-medium">Bio</label>
-                <textarea name="bio" id="bio" rows="4"
-                    class="w-full px-4 py-3 border border-white bg-transparent text-white rounded-md placeholder-gray-300 focus:outline-none focus:ring focus:ring-white"></textarea>
-            </div>
-            <div>
-                <button type="submit"
-                    name="submit" class="w-full px-6 py-3 text-lg font-medium text-blue-500 bg-white rounded-md hover:bg-gray-200 focus:outline-none focus:ring focus:ring-blue-300">
-                    Register
-                </button>
-            </div>
+    <!-- Left Section: Branding -->
+    <div class="md:w-1/2 bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-700 text-white flex flex-col justify-center items-center p-12 relative">
+      <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
 
-            <!-- Success Messages -->
-            <?php if (!empty($successMessage)): ?>
-                <div class="mt-4 text-green-500">
-                    <p><?= $successMessage ?></p>
-                </div>
-            <?php endif; ?>
+      <div class="relative z-10 text-center">
+        <h1 class="text-4xl font-extrabold mb-4 tracking-tight">Welcome to <span class="text-blue-200">skillPro</span></h1>
+        <p class="text-blue-100 text-lg leading-relaxed max-w-md mx-auto">
+          Join thousands of learners and instructors on our platform.  
+          Build your profile, share your knowledge, and grow your skills.
+        </p>
+      </div>
 
-            <!-- Error Messages -->
-            <?php if (!empty($errors)): ?>
-                <div class="mt-4 text-red-500">
-                    <?php foreach ($errors as $error): ?>
-                        <p><?= $error ?></p>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </form>
+      <div class="relative z-10 mt-10">
+        <img src="./logo.jpg"
+             alt="Learning Illustration" class="w-64 drop-shadow-lg">
+      </div>
     </div>
+
+    <!-- Right Section: Registration -->
+    <div class="md:w-1/2 bg-white p-10">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Create Your Account</h2>
+
+      <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="firstName" class="block text-gray-700 font-medium mb-1">First Name</label>
+            <input type="text" name="firstName" id="firstName"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-gray-400"
+              placeholder="John">
+          </div>
+          <div>
+            <label for="lastName" class="block text-gray-700 font-medium mb-1">Last Name</label>
+            <input type="text" name="lastName" id="lastName"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-gray-400"
+              placeholder="Doe">
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-gray-700 font-medium mb-1">Email</label>
+          <input type="email" name="email" id="email"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-gray-400"
+            placeholder="you@example.com">
+        </div>
+
+        <div>
+          <label for="password" class="block text-gray-700 font-medium mb-1">Password</label>
+          <input type="password" name="password" id="password"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-gray-400"
+            placeholder="••••••••">
+        </div>
+
+        <div>
+          <label for="role" class="block text-gray-700 font-medium mb-1">Role</label>
+          <select name="role" id="role"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="">Select Role</option>
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="profile_pic" class="block text-gray-700 font-medium mb-1">Profile Picture</label>
+          <input type="file" name="profile_pic" id="profile_pic"
+            class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div>
+          <label for="bio" class="block text-gray-700 font-medium mb-1">Bio</label>
+          <textarea name="bio" id="bio" rows="3"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder-gray-400"
+            placeholder="Tell us about yourself..."></textarea>
+        </div>
+
+        <button type="submit" name="submit"
+          class="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300">
+          Sign Up
+        </button>
+
+        <!-- PHP Messages -->
+        <?php if (!empty($successMessage)): ?>
+          <div class="mt-4 text-green-600 text-center font-medium">
+            <p><?= $successMessage ?></p>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!empty($errors)): ?>
+          <div class="mt-4 text-red-600 text-center font-medium space-y-1">
+            <?php foreach ($errors as $error): ?>
+              <p><?= $error ?></p>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </form>
+    </div>
+  </div>
 </body>
+
+
 
 </html>

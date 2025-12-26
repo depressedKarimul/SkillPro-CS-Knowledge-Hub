@@ -1,60 +1,26 @@
-/* ------------------------------------------------ */
-/* use in Live Course Contents section */
-.card-h3 {
-  font-size: 1.25em;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-}
 
-.card-p {
-  font-size: 1em;
-  color: #666;
-  line-height: 1.5;
-}
-/* ------------------------------------------- */
-
-
-
-.stat-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px;
-}
-
-.stat-card {
-  width: auto;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  margin: 10px;
-  width: 200px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card-title {
-  font-size: 2em;
-  font-weight: bold;
-  color: #1a202c;
-  margin-bottom: 10px;
-}
-
-.stat-card-description {
-  font-size: 1em;
-  color: #4a5568;
-}
-
-/* Responsive design for smaller devices */
-@media (max-width: 600px) {
-  .stat-container {
+/* Center the whole carousel section */
+.carousel {
+    display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  .stat-card {
-    width: 100%; /* Full width on small devices */
-    max-width: 300px; /* Set a max width to maintain card size */
-  }
 }
+
+/* Big smooth shadow around each slide section */
+.carousel-item {
+    padding: 40px 0;
+    filter: drop-shadow(0px 15px 30px rgba(0,0,0,0.15))
+            drop-shadow(0px -10px 20px rgba(0,0,0,0.10));
+}
+
+/* Make cards centered inside each slide */
+.carousel-item > div {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Card shadow improved */
+.course-card-enhanced {
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.18);
+}
+

@@ -49,7 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $quiz_exists) {
         $correct_answer = $question['answer'];
         $user_answer = $answers[$question_id] ?? null;
 
-        $is_correct = (strcasecmp($user_answer, $correct_answer) == 0);
+        // For multiple choice, match option text
+        $is_correct = false;
+        if ($question['question_type'] == 'multiple_choice') {
+            $options = [
+                'A' => $question['option1'],
+                'B' => $question['option2'],
+                'C' => $question['option3'],
+                'D' => $question['option4'],
+            ];
+            $selected_text = $options[$user_answer] ?? '';
+            $is_correct = (strcasecmp($selected_text, $correct_answer) == 0);
+        } else {
+            $is_correct = (strcasecmp($user_answer, $correct_answer) == 0);
+        }
+
         $results[$question_id] = $is_correct;
 
         if (!$is_correct) {
@@ -76,78 +90,129 @@ if ($quiz_exists) {
     $result_questions = $stmt_questions->get_result();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <?php include('head_content.php'); ?>
 </head>
-<body class="bg-[#283747] p-8">
-    <div class="max-w-4xl mx-auto bg-[#1C2833] p-8 rounded-lg shadow-lg text-white">
-        <h1 class="text-3xl font-bold text-center">Quiz for Course #<?php echo $course_id; ?></h1>
+
+<body class="bg-cover bg-center min-h-screen p-8"
+      style="background-image: url('https://i.postimg.cc/C5mf7kSb/4847051.jpg');">
+
+    <!-- CARD with Opacity -->
+    <div class="max-w-4xl mx-auto bg-white/80 backdrop-blur-md 
+                p-10 rounded-2xl shadow-xl border">
+
+        <h1 class="text-3xl font-extrabold text-center text-gray-800">
+            Quiz for Course #<?php echo $course_id; ?>
+        </h1>
 
         <?php if (!$quiz_exists) { ?>
-            <p class="mt-4 text-lg text-center text-red-500">No quiz available for this course.</p>
+
+            <p class="mt-4 text-lg text-center text-red-600 font-semibold">
+                No quiz available for this course.
+            </p>
+
         <?php } else { ?>
-            <p class="mt-4 text-lg">Total Questions: <?php echo $total_questions; ?></p>
+
+            <p class="mt-4 text-lg font-medium text-gray-700">
+                Total Questions: <?php echo $total_questions; ?>
+            </p>
 
             <?php if ($_SERVER['REQUEST_METHOD'] == 'POST') { ?>
-                <h2 class="mt-4 text-xl font-bold">Results:</h2>
+
+                <h2 class="mt-6 text-2xl font-bold text-gray-800">Results:</h2>
+
                 <?php
                 $question_number = 1;
                 foreach ($results as $question_id => $is_correct) {
-                    $status = $is_correct ? "Correct ✅" : "Wrong ❌";
-                    echo "<p class='mt-2'>Q{$question_number}: {$status}</p>";
+                    $status = $is_correct ?
+                        "<span class='text-green-600 font-semibold'>Correct ✅</span>" :
+                        "<span class='text-red-600 font-semibold'>Wrong ❌</span>";
+
+                    echo "<p class='mt-2 text-lg text-gray-700'>Q{$question_number}: {$status}</p>";
                     $question_number++;
                 }
                 ?>
+
                 <?php if ($all_correct && isset($success_message)) { ?>
-                    <p class="mt-6 text-green-400 font-semibold"><?php echo $success_message; ?></p>
+                    <p class="mt-6 text-green-600 text-xl font-semibold">
+                        <?php echo $success_message; ?>
+                    </p>
                 <?php } ?>
+
+                <!-- HOME BUTTON -->
+                <a href="student.php" 
+                   class="mt-8 block text-center bg-blue-600 text-white py-3 rounded-lg 
+                          font-semibold hover:bg-blue-700 transition">
+                    Go to Home
+                </a>
+
             <?php } else { ?>
-                <form action="quiz_page.php?course_id=<?php echo $course_id; ?>" method="POST" class="mt-6 space-y-6">
+
+                <form action="quiz_page.php?course_id=<?php echo $course_id; ?>" 
+                      method="POST" class="mt-6 space-y-8">
+
                     <?php
                     $question_number = 1;
                     while ($question = $result_questions->fetch_assoc()) {
                         $question_id = $question['question_id'];
                         $question_text = htmlspecialchars($question['question_text']);
                         $question_type = $question['question_type'];
-                        ?>
-                        <div class="mb-6">
-                            <h2 class="text-xl font-semibold">
+                        $options = [
+                            'A' => $question['option1'],
+                            'B' => $question['option2'],
+                            'C' => $question['option3'],
+                            'D' => $question['option4'],
+                        ];
+                    ?>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">
                                 Q<?php echo $question_number++; ?>. <?php echo $question_text; ?>
                             </h2>
 
                             <?php if ($question_type == 'multiple_choice') { ?>
-                                <label class="block mt-2">
-                                    <input type="radio" name="answers[<?php echo $question_id; ?>]" value="A" required> Option A
-                                </label>
-                                <label class="block">
-                                    <input type="radio" name="answers[<?php echo $question_id; ?>]" value="B"> Option B
-                                </label>
-                                <label class="block">
-                                    <input type="radio" name="answers[<?php echo $question_id; ?>]" value="C"> Option C
-                                </label>
-                                <label class="block">
-                                    <input type="radio" name="answers[<?php echo $question_id; ?>]" value="D"> Option D
-                                </label>
+                                <?php foreach ($options as $key => $text) { 
+                                    if ($text != null) { ?>
+                                        <label class="block mt-2 text-gray-700">
+                                            <input type="radio" name="answers[<?php echo $question_id; ?>]" value="<?php echo $key; ?>" required> <?php echo htmlspecialchars($text); ?>
+                                        </label>
+                                <?php } } ?>
+
                             <?php } elseif ($question_type == 'true_false') { ?>
-                                <label class="block mt-2">
+                                <label class="block mt-2 text-gray-700">
                                     <input type="radio" name="answers[<?php echo $question_id; ?>]" value="true" required> True
                                 </label>
-                                <label class="block">
+                                <label class="block text-gray-700">
                                     <input type="radio" name="answers[<?php echo $question_id; ?>]" value="false"> False
                                 </label>
+
                             <?php } elseif ($question_type == 'short_answer') { ?>
-                                <input type="text" name="answers[<?php echo $question_id; ?>]" class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <input type="text"
+                                       name="answers[<?php echo $question_id; ?>]"
+                                       class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg 
+                                              bg-white/90 focus:bg-white focus:outline-none 
+                                              focus:ring-2 focus:ring-blue-500"
+                                       required>
                             <?php } ?>
+
                         </div>
+
                     <?php } ?>
 
-                    <button type="submit" class="w-full bg-green-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-green-600 transition">Submit Quiz</button>
+                    <button type="submit"
+                            class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg 
+                                   hover:bg-green-700 transition">
+                        Submit Quiz
+                    </button>
+
                 </form>
+
             <?php } ?>
         <?php } ?>
+
     </div>
+
 </body>
 </html>

@@ -22,10 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $message = "Course ID does not exist in the database.";
     } else {
         // Insert data into Quiz table
-        $insert_quiz_query = "
-            INSERT INTO Quiz (course_id, total_questions, passing_marks) 
-            VALUES (?, ?, ?)
-        ";
+        $insert_quiz_query = "INSERT INTO Quiz (course_id, total_questions, passing_marks) VALUES (?, ?, ?)";
         $stmt_quiz = $conn->prepare($insert_quiz_query);
         $stmt_quiz->bind_param("iii", $course_id, $total_questions, $passing_marks);
 
@@ -41,12 +38,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $question_type = $question['type'];
                 $answer = $question['answer'];
 
+                // For multiple choice, get options
+                $option1 = $option2 = $option3 = $option4 = null;
+                if ($question_type === 'multiple_choice') {
+                    $option1 = $question['option1'];
+                    $option2 = $question['option2'];
+                    $option3 = $question['option3'];
+                    $option4 = $question['option4'];
+                }
+
                 $insert_question_query = "
-                    INSERT INTO Question (quiz_id, question_text, question_type, answer) 
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO Question (quiz_id, question_text, question_type, option1, option2, option3, option4, answer) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ";
                 $stmt_question = $conn->prepare($insert_question_query);
-                $stmt_question->bind_param("isss", $quiz_id, $question_text, $question_type, $answer);
+                $stmt_question->bind_param(
+                    "isssssss",
+                    $quiz_id,
+                    $question_text,
+                    $question_type,
+                    $option1,
+                    $option2,
+                    $option3,
+                    $option4,
+                    $answer
+                );
 
                 if (!$stmt_question->execute()) {
                     $errors[] = "Error adding question: " . $stmt_question->error;
@@ -68,175 +84,150 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <?php 
-   include('head_content.php')
-   ?>
+   <?php include('head_content.php') ?>
 </head>
-<body class="bg-cover bg-center" style="background-image: url('https://img.freepik.com/free-photo/cool-geometric-triangular-figure-neon-laser-light-great-backgrounds-wallpapers_181624-9331.jpg?t=st=1733140206~exp=1733143806~hmac=b1e4b10de61c6296088f643d3120b628163bd86f9eabbc2f96f60707432a3024&w=1060');">
-    <div class="min-h-screen flex items-center justify-center bg-gray-900 bg-opacity-50">
-        <div class="max-w-4xl mx-auto bg-transparent shadow-md rounded-lg p-6 backdrop-blur-md">
-            <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Upload Quiz</h1>
-            
-            <form method="POST" class="space-y-6" onsubmit="return validateForm()">
+<body class="min-h-screen bg-cover bg-center" 
+      style="background-image: url('https://i.postimg.cc/C5mf7kSb/4847051.jpg');">
+
+    <div class="min-h-screen flex items-center justify-center bg-black/20 backdrop-blur-sm">
+
+        <div class="max-w-4xl w-full bg-white/70 shadow-xl rounded-2xl p-10 backdrop-blur-md">
+
+            <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
+                Upload Quiz
+            </h1>
+
+            <form method="POST" class="space-y-8" onsubmit="return validateForm()">
+                
                 <!-- Course ID -->
                 <div>
-                    <label for="course_id" class="block text-lg font-medium text-white">Course ID:</label>
+                    <label class="block text-lg font-medium text-gray-800">Course ID</label>
                     <input 
                         id="course_id"
-                        name="course_id" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        name="course_id"
+                        class="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500"
                     >
-                    <span id="course-id-error" class="text-red-500 text-sm hidden">Please enter a valid Course ID.</span>
                 </div>
-                
+
                 <!-- Total Questions -->
                 <div>
-                    <label for="total_questions" class="block text-lg font-medium text-white">Total Questions:</label>
+                    <label class="block text-lg font-medium text-gray-800">Total Questions</label>
                     <input 
                         id="total_questions"
-                        name="total_questions" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        name="total_questions"
+                        type="number"
+                        min="1"
+                        oninput="generateQuestionFields()"
+                        class="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500"
                     >
-                    <span id="total-questions-error" class="text-red-500 text-sm hidden">Please enter the total number of questions.</span>
                 </div>
-                
+
                 <!-- Passing Marks -->
                 <div>
-                    <label for="passing_marks" class="block text-lg font-medium text-white">Passing Marks:</label>
+                    <label class="block text-lg font-medium text-gray-800">Passing Marks</label>
                     <input 
                         id="passing_marks"
-                        name="passing_marks" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        name="passing_marks"
+                        class="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500"
                     >
-                    <span id="passing-marks-error" class="text-red-500 text-sm hidden">Please enter the passing marks.</span>
-                </div>
-                
-                <!-- Questions Section -->
-                <h3 class="text-center text-3xl font-semibold text-[white]">Questions</h3>
-                <div id="questions-container" class="space-y-6">
-                    <div class="question bg-transparent p-4 rounded-lg shadow-sm">
-                        <label class="block text-lg font-medium text-white">Question Text:</label>
-                        <input 
-                            type="text" 
-                            name="questions[0][text]" 
-                            class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                        >
-
-                        <label class="block text-lg font-medium text-white mt-4">Question Type:</label>
-                        <select 
-                            name="questions[0][type]" 
-                            class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                        >
-                            <option value="multiple_choice">Multiple Choice</option>
-                            <option value="true_false">True/False</option>
-                            <option value="short_answer">Short Answer</option>
-                        </select>
-
-                        <label class="block text-lg font-medium text-white mt-4">Answer:</label>
-                        <input 
-                            type="text" 
-                            name="questions[0][answer]" 
-                            class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                        >
-                    </div>
                 </div>
 
-                <!-- Add Question Button -->
+                <h2 class="text-2xl font-semibold text-gray-900">Questions</h2>
+                <div id="questions-container" class="space-y-6"></div>
+
+                <!-- Submit -->
                 <button 
-                    type="button" 
-                    onclick="addQuestion()" 
-                    class="w-full bg-blue-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                >
-                    Add Another Question
-                </button>
-                
-                <!-- Submit Button -->
-                <button 
-                    type="submit" 
-                    class="w-full bg-green-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-green-600 transition"
+                    type="submit"
+                    class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg shadow hover:bg-green-700 transition"
                 >
                     Upload Quiz
                 </button>
+
             </form>
-            
-            <!-- Success/Error Message -->
-            <p class="text-center text-lg font-medium text-[green] mt-4">
+
+            <!-- Message -->
+            <p class="text-center text-green-600 font-semibold text-lg mt-6">
                 <?php echo htmlspecialchars($message); ?>
             </p>
+
+            <!-- Go to Home Button -->
+            <?php if (!empty($message) && $message === "Quiz and questions uploaded successfully!"): ?>
+                <div class="text-center mt-4">
+                    <a href="instructor.php" 
+                       class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
+                       Go to Home
+                    </a>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
 
-    <script>
-        let questionIndex = 1;
+<script>
+function generateQuestionFields() {
+    let total = document.getElementById("total_questions").value;
+    const container = document.getElementById("questions-container");
+    container.innerHTML = "";
 
-        function addQuestion() {
-            const container = document.getElementById('questions-container');
-            const newQuestion = document.createElement('div');
-            newQuestion.classList.add('bg-transparent', 'p-4', 'rounded-lg', 'shadow-sm', 'mt-6');
-            newQuestion.innerHTML = `
-                <div class="question">
-                    <label class="block text-lg font-medium text-gray-700">Question Text:</label>
-                    <input 
-                        type="text" 
-                        name="questions[${questionIndex}][text]" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+    if (total < 1) return;
 
-                    <label class="block text-lg font-medium text-gray-700 mt-4">Question Type:</label>
-                    <select 
-                        name="questions[${questionIndex}][type]" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="multiple_choice">Multiple Choice</option>
-                        <option value="true_false">True/False</option>
-                        <option value="short_answer">Short Answer</option>
-                    </select>
+    for (let i = 0; i < total; i++) {
+        container.innerHTML += `
+            <div class="bg-white/60 p-6 rounded-xl border shadow-sm backdrop-blur-sm">
 
-                    <label class="block text-lg font-medium text-gray-700 mt-4">Answer:</label>
-                    <input 
-                        type="text" 
-                        name="questions[${questionIndex}][answer]" 
-                        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                <h3 class="font-semibold text-lg text-gray-800 mb-4">Question ${i + 1}</h3>
+
+                <label class="block text-gray-800 font-medium">Question Text</label>
+                <input 
+                    type="text"
+                    name="questions[${i}][text]"
+                    class="w-full mt-2 mb-4 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500"
+                >
+
+                <label class="block text-gray-800 font-medium">Question Type</label>
+                <select 
+                    name="questions[${i}][type]"
+                    class="w-full mt-2 mb-4 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500"
+                    onchange="toggleOptions(this, ${i})"
+                >
+                    <option value="multiple_choice">Multiple Choice</option>
+                    <option value="true_false">True/False</option>
+                    <option value="short_answer">Short Answer</option>
+                </select>
+
+                <div id="options-container-${i}" class="space-y-2 mt-2">
+                    <!-- Options for multiple choice will appear here -->
+                    <label class="block text-gray-800 font-medium">Option 1</label>
+                    <input type="text" name="questions[${i}][option1]" class="w-full px-4 py-2 border rounded-lg">
+                    <label class="block text-gray-800 font-medium">Option 2</label>
+                    <input type="text" name="questions[${i}][option2]" class="w-full px-4 py-2 border rounded-lg">
+                    <label class="block text-gray-800 font-medium">Option 3</label>
+                    <input type="text" name="questions[${i}][option3]" class="w-full px-4 py-2 border rounded-lg">
+                    <label class="block text-gray-800 font-medium">Option 4</label>
+                    <input type="text" name="questions[${i}][option4]" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-            `;
-            container.appendChild(newQuestion);
-            questionIndex++;
-        }
 
-        function validateForm() {
-            let isValid = true;
-            
-            // Validate Course ID
-            const courseId = document.getElementById("course_id").value;
-            if (!courseId) {
-                document.getElementById("course-id-error").classList.remove("hidden");
-                isValid = false;
-            } else {
-                document.getElementById("course-id-error").classList.add("hidden");
-            }
+                <label class="block text-gray-800 font-medium mt-4">Answer</label>
+                <input 
+                    type="text"
+                    name="questions[${i}][answer]"
+                    class="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 shadow-sm focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+        `;
+    }
+}
 
-            // Validate Total Questions
-            const totalQuestions = document.getElementById("total_questions").value;
-            if (!totalQuestions) {
-                document.getElementById("total-questions-error").classList.remove("hidden");
-                isValid = false;
-            } else {
-                document.getElementById("total-questions-error").classList.add("hidden");
-            }
+// Hide options if not multiple choice
+function toggleOptions(select, index) {
+    const optionsDiv = document.getElementById(`options-container-${index}`);
+    if (select.value === 'multiple_choice') {
+        optionsDiv.style.display = 'block';
+    } else {
+        optionsDiv.style.display = 'none';
+    }
+}
+</script>
 
-            // Validate Passing Marks
-            const passingMarks = document.getElementById("passing_marks").value;
-            if (!passingMarks) {
-                document.getElementById("passing-marks-error").classList.remove("hidden");
-                isValid = false;
-            } else {
-                document.getElementById("passing-marks-error").classList.add("hidden");
-            }
-
-            return isValid;
-        }
-    </script>
 </body>
-
 </html>

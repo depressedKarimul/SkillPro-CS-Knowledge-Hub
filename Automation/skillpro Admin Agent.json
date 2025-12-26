@@ -1,0 +1,289 @@
+{
+  "name": "skillpro Admin Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "id": "9c8a8ac5-40ed-475f-ac8a-0cb4eb2b3faf",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        704,
+        944
+      ],
+      "webhookId": "3acd9b82-a7a8-4901-b0c1-1d08822bc2dc"
+    },
+    {
+      "parameters": {},
+      "id": "0c45076a-a437-4626-95aa-95e2345553ca",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('recipient_email') }}",
+        "subject": "={{ $fromAI('email_subject') }}",
+        "message": "={{ $fromAI('email_body') }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "skillpro Admin"
+        }
+      },
+      "id": "5a63d766-e5bc-4006-a4ce-9fa7c7b55d88",
+      "name": "Gmail Tool",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        1168
+      ],
+      "webhookId": "2e6510aa-f812-4dff-86c6-68d3fae8fedc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8pAb0zZm7LNRyAKq",
+          "name": "myMail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an intelligent AI assistant for a course management system connected to Google Sheets.\n\nYour role is to help users access information about instructors, students, and courses stored across three Google Sheets:\n1. **Instructor Info Sheet** - Contains instructor details (name, email, information)\n2. **Student Info Sheet** - Contains student details (name, enrolled courses, contact info)\n3. **Instructor Course Sheet** - Contains course-instructor relationships\n\n**Your capabilities:**\n\n1. **Information Retrieval:**\n   - Provide instructor details (name, email, information, courses taught)\n   - Show which teachers teach which courses\n   - Display which students bought/enrolled in which courses\n   - Show which students are learning under which instructor\n   - Cross-reference data across the three sheets to provide comprehensive answers\n\n2. **Admin Commands (for authorized users):**\n   - Add new instructors, students, or courses to the appropriate Google Sheet\n   - Delete records from Google Sheets\n   - Update existing information in the sheets\n   - Send emails to instructors or students using their email addresses from the sheets\n\n**Important rules:**\n- ALWAYS use the appropriate Google Sheets Tool to read data before answering questions\n- Use multiple sheet tools when you need to cross-reference information (e.g., finding which students are under an instructor requires checking both Student Info and Instructor Course sheets)\n- NEVER guess or make up information - only use data from Google Sheets\n- For admin commands (add, delete, update), confirm the action details and which sheet will be modified before executing\n- When sending emails, first retrieve the email address from the appropriate sheet, then use the Gmail Tool\n- Respond clearly, professionally, and accurately\n- If data is not found in the sheets, inform the user politely\n\n**Before performing destructive actions (delete, update), always:**\n1. Confirm what will be changed and in which sheet\n2. Ask for user confirmation\n3. Only proceed after receiving explicit approval"
+        }
+      },
+      "id": "142db865-c385-4407-9846-3f3a81f9ef60",
+      "name": "Course Management Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1248,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Manage student information - read, add, update, or delete student records",
+        "documentId": {
+          "__rl": true,
+          "value": "1yED7KROdX7dRyDgtYYAZfPvYHgUIvK4t4LjvtYDc5Gg",
+          "mode": "list",
+          "cachedResultName": "student_info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yED7KROdX7dRyDgtYYAZfPvYHgUIvK4t4LjvtYDc5Gg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1772233382,
+          "mode": "list",
+          "cachedResultName": "Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yED7KROdX7dRyDgtYYAZfPvYHgUIvK4t4LjvtYDc5Gg/edit#gid=1772233382"
+        },
+        "options": {}
+      },
+      "id": "008d3d30-0a6b-4140-bbea-2581b8da97aa",
+      "name": "Student Info Sheet Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1312,
+        1168
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jF68DVMlLXhyO8XS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Manage course-instructor relationships - read, add, update, or delete course assignments",
+        "documentId": {
+          "__rl": true,
+          "value": "1jP95RDTPF_7h2730VdMEC3Sat4nT1mP3GEKNVf06610",
+          "mode": "list",
+          "cachedResultName": "instructor_course",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jP95RDTPF_7h2730VdMEC3Sat4nT1mP3GEKNVf06610/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 849664548,
+          "mode": "list",
+          "cachedResultName": "Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jP95RDTPF_7h2730VdMEC3Sat4nT1mP3GEKNVf06610/edit#gid=849664548"
+        },
+        "options": {}
+      },
+      "id": "f8f2f705-6cb9-4240-bed4-12b0f5e2ed00",
+      "name": "Instructor Course Sheet Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1440,
+        1168
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jF68DVMlLXhyO8XS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Manage instructor information - read, add, update, or delete instructor records",
+        "documentId": {
+          "__rl": true,
+          "value": "1BvhWm_21EpNcYSS74aVqCcNaV_yFyGiC-M-R0nbGRTk",
+          "mode": "list",
+          "cachedResultName": "instructor_info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BvhWm_21EpNcYSS74aVqCcNaV_yFyGiC-M-R0nbGRTk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2113060420,
+          "mode": "list",
+          "cachedResultName": "Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BvhWm_21EpNcYSS74aVqCcNaV_yFyGiC-M-R0nbGRTk/edit#gid=2113060420"
+        },
+        "options": {}
+      },
+      "id": "4d91a9a4-ce9b-4e5e-862d-cfc997c76183",
+      "name": "instructor_info",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        1168
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jF68DVMlLXhyO8XS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        1168
+      ],
+      "id": "978cf820-6344-40b2-9d52-06821ebb6a41",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "I5AHxtvaHeoQyKGd",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Student Info Sheet Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instructor Course Sheet Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "instructor_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Course Management Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8cc809fb-11bf-43c2-9083-c23da667a024",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5640d61eee987823035f89830f720b79b8231d61b7990797b1069e71d8495516"
+  },
+  "id": "M0GeFwIupuFukTca",
+  "tags": []
+}

@@ -43,6 +43,10 @@ if (isset($_POST['course_id'])) {
         echo "You do not have permission to delete this course.";
         exit();
     }
+    
+    // Fetch course details for logging before deletion
+    $courseDataForLog = $result_course->fetch_assoc();
+    $courseTitleForLog = $courseDataForLog ? $courseDataForLog['title'] : "Unknown Course";
 
     // Delete related content (video)
     $query_content = "DELETE FROM Course_Content WHERE course_id = ?";
@@ -58,6 +62,8 @@ if (isset($_POST['course_id'])) {
 
     // Check if the course was successfully deleted
     if ($stmt_delete_course->affected_rows > 0) {
+        include_once 'utils/ActivityLogger.php';
+        logActivity($conn, "Instructor (ID: $user_id) deleted Course '$courseTitleForLog' (ID: $course_id).");
         echo "Course deleted successfully.";
         header("Location: edit_course.php"); // Redirect back to the course management page
         exit();
